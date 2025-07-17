@@ -9,13 +9,51 @@
 <ServiceWorkerStatus />
 
 <div class="mt-4">
+    <h2>Cache PolicyProvider Demo</h2>
+    <p>
+        The following resources are configured with different caching strategies:<br />
+        <ul>
+            <li><b>Images (.png, .jpg):</b> <code>CacheFirst</code></li>
+            <li><b>API calls ("api/"):</b> <code>NetworkFirst</code></li>
+            <li><b>CSS files (.css):</b> <code>StaleWhileRevalidate</code></li>
+        </ul>
+        Try reloading the page, going offline, or changing images to see the effect.
+    </p>
+    <div>
+        <img src="sample-image.png?v=@imageVersion" alt="Sample" width="128" height="128" />
+        <button class="btn btn-outline-primary" @onclick="ReloadImage">Reload Image</button>
+    </div>
+    <div class="mt-2">
+        <button class="btn btn-outline-secondary" @onclick="CallApi">Call API (simulated)</button>
+        <div>@apiResult</div>
+    </div>
+</div>
+
+<div class="mt-4">
     <h2>Features</h2>
     <ul>
         <li><strong>ServiceWorkerManager</strong> - Registers, updates and unregisters your app's service worker; surfaces lifecycle events</li>
-        <li><strong>CachePolicyProvider</strong> - Coming soon: Attribute or service to declare per-resource caching strategies</li>
+        <li><strong>CachePolicyProvider</strong> - Attribute or service to declare per-resource caching strategies</li>
         <li><strong>UpdatePrompt</strong> - Coming soon: UI component that detects a new service worker version and prompts the user to refresh</li>
         <li><strong>OfflineFallback</strong> - Coming soon: Configurable component to render offline pages</li>
         <li><strong>PushNotificationManager</strong> - Coming soon: Blazor service + UI helpers for push notifications</li>
         <li><strong>BackgroundSyncService</strong> - Coming soon: Queues failed API calls and retries them when connectivity is restored</li>
     </ul>
 </div>
+
+@code {
+    private string apiResult = string.Empty;
+    private int imageVersion = 1;
+
+    private void ReloadImage()
+    {
+        imageVersion++;
+    }
+
+    private async Task CallApi()
+    {
+        // Simulate an API call
+        await Task.Delay(300);
+        apiResult = $"API call at {DateTime.Now:T}";
+    }
+}

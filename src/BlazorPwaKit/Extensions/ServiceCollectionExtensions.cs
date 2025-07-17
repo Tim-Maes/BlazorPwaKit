@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBlazorPwaKit(this IServiceCollection services)
     {
         services.AddScoped<ServiceWorkerManager>();
+        services.AddSingleton<ICachePolicyProvider, CachePolicyProvider>();
         return services;
     }
     

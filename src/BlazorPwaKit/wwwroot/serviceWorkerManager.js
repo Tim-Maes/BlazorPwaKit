@@ -65,7 +65,8 @@ export async function updateServiceWorker(scriptUrl, scope) {
         if (registration) {
             const updatedRegistration = await registration.update();
             if (dotNetReference) {
-                dotNetReference.invokeMethodAsync('OnServiceWorkerEvent', 'updated', null);            }
+                dotNetReference.invokeMethodAsync('OnServiceWorkerEvent', 'updated', null);
+            }
             return true;
         }
         
@@ -131,6 +132,26 @@ export async function getServiceWorkerState() {
     } catch (error) {
         console.error('Failed to get service worker state:', error);
         return null;
+    }
+}
+
+export async function setCachePolicies(policies) {
+    // Send cache policies to the active service worker
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SET_CACHE_POLICIES',
+            policies: policies
+        });
+    } else {
+        // Wait for the service worker to become active
+        navigator.serviceWorker.ready.then(reg => {
+            if (reg.active) {
+                reg.active.postMessage({
+                    type: 'SET_CACHE_POLICIES',
+                    policies: policies
+                });
+            }
+        });
     }
 }
 

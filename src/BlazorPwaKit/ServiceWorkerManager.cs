@@ -39,7 +39,8 @@ public class ServiceWorkerManager : IAsyncDisposable
     private readonly IJSRuntime _jsRuntime;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
     private readonly Dictionary<string, ServiceWorkerRegistration> _registrations = new();
-    
+    private ICachePolicyProvider? _cachePolicyProvider;
+
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerInstalled;
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerActivated;
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerFetch;
@@ -211,6 +212,26 @@ public class ServiceWorkerManager : IAsyncDisposable
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Pushes all cache policies to the service worker
+    /// </summary>
+    public async Task PushCachePoliciesAsync()
+    {
+        if (_cachePolicyProvider == null) return;
+        var policies = _cachePolicyProvider.ExportPoliciesForJs();
+        var module = await _moduleTask.Value;
+        await module.InvokeVoidAsync("setCachePolicies", policies);
+    }
+
+    /// <summary>
+    /// Sets the cache policy provider
+    /// </summary>
+    /// <param name="provider">The cache policy provider</param>
+    public void SetCachePolicyProvider(ICachePolicyProvider provider)
+    {
+        _cachePolicyProvider = provider;
     }
 
     /// <summary>
