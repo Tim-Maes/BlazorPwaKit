@@ -8,11 +8,10 @@ Still in early development.
 
 - **ServiceWorkerManager**: Register, update, and unregister service workers with full lifecycle event support.
 - **CachePolicyProvider**: Attribute/service for per-resource caching strategies (CacheFirst, NetworkFirst, StaleWhileRevalidate, etc.).
-- **OfflineFallback**: Configurable component to render a ìyouíre offlineî page or placeholder when a requested route or asset isnít cached.
+- **OfflineFallback**: Configurable component to render a ‚Äúyou‚Äôre offline‚Äù page or placeholder when a requested route or asset isn‚Äôt cached.
 - **UpdatePrompt**: UI component that detects a new service worker version and prompts the user to refresh/reload.
 - **ConnectivityStatus**: UI component and service for real-time online/offline state and change events.
 - **Easy DI integration**: One-liner setup for all services and components.
-- **Example project**: See `BlazorPwaKit.Example` for real-world usage.
 
 ## Getting Started
 
