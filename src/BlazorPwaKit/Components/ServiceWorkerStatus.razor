@@ -1,0 +1,176 @@
+@using BlazorPwaKit
+@inject ServiceWorkerManager ServiceWorkerManager
+@implements IDisposable
+
+<div class="service-worker-status">
+    <h3>Service Worker Status</h3>
+    
+    <div class="status-info">
+        <p><strong>Supported:</strong> @(isSupported ? "Yes" : "No")</p>
+        <p><strong>State:</strong> @currentState</p>
+        <p><strong>Registrations:</strong> @registrations.Count</p>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-primary" @onclick="RegisterServiceWorker" disabled="@(!isSupported)">
+            Register Service Worker
+        </button>
+        <button class="btn btn-secondary" @onclick="UpdateServiceWorker" disabled="@(!hasRegistration)">
+            Update Service Worker
+        </button>
+        <button class="btn btn-danger" @onclick="UnregisterServiceWorker" disabled="@(!hasRegistration)">
+            Unregister Service Worker
+        </button>
+    </div>
+
+    @if (events.Any())
+    {
+        <div class="events-log">
+            <h4>Service Worker Events</h4>
+            <div class="events-list">
+                @foreach (var evt in events.TakeLast(10))
+                {
+                    <div class="event-item">
+                        <span class="event-type">@evt.Type</span>
+                        @if (!string.IsNullOrEmpty(evt.Message))
+                        {
+                            <span class="event-message">: @evt.Message</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isSupported;
+    private string currentState = "Unknown";
+    private Dictionary<string, ServiceWorkerRegistration> registrations = new();
+    private List<ServiceWorkerEvent> events = new();
+    private bool hasRegistration => registrations.Any();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to service worker events
+        ServiceWorkerManager.ServiceWorkerInstalled += OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerActivated += OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerFetch += OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerMessage += OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerError += OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerUpdated += OnServiceWorkerEvent;
+
+        // Check if service workers are supported
+        isSupported = await ServiceWorkerManager.IsServiceWorkerSupportedAsync();
+        
+        if (isSupported)
+        {
+            currentState = await ServiceWorkerManager.GetServiceWorkerStateAsync() ?? "Unknown";
+            registrations = ServiceWorkerManager.GetAllRegistrations().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+    }
+
+    private async Task RegisterServiceWorker()
+    {
+        var success = await ServiceWorkerManager.RegisterAsync("service-worker.js");
+        if (success)
+        {
+            registrations = ServiceWorkerManager.GetAllRegistrations().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            currentState = await ServiceWorkerManager.GetServiceWorkerStateAsync() ?? "Unknown";
+        }
+        StateHasChanged();
+    }
+
+    private async Task UpdateServiceWorker()
+    {
+        var success = await ServiceWorkerManager.UpdateAsync("service-worker.js");
+        if (success)
+        {
+            registrations = ServiceWorkerManager.GetAllRegistrations().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            currentState = await ServiceWorkerManager.GetServiceWorkerStateAsync() ?? "Unknown";
+        }
+        StateHasChanged();
+    }
+
+    private async Task UnregisterServiceWorker()
+    {
+        var success = await ServiceWorkerManager.UnregisterAsync("service-worker.js");
+        if (success)
+        {
+            registrations = ServiceWorkerManager.GetAllRegistrations().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            currentState = await ServiceWorkerManager.GetServiceWorkerStateAsync() ?? "Unknown";
+        }
+        StateHasChanged();
+    }
+
+    private void OnServiceWorkerEvent(object? sender, ServiceWorkerEvent evt)
+    {
+        events.Add(evt);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ServiceWorkerManager.ServiceWorkerInstalled -= OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerActivated -= OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerFetch -= OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerMessage -= OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerError -= OnServiceWorkerEvent;
+        ServiceWorkerManager.ServiceWorkerUpdated -= OnServiceWorkerEvent;
+    }
+}
+
+<style>
+    .service-worker-status {
+        max-width: 600px;
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9f9f9;
+    }
+
+    .status-info {
+        margin: 15px 0;
+    }
+
+    .actions {
+        margin: 15px 0;
+    }
+
+    .actions button {
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+
+    .events-log {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    .events-list {
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .event-item {
+        margin: 5px 0;
+        padding: 5px;
+        border-left: 3px solid #007bff;
+        background: #f8f9fa;
+    }
+
+    .event-type {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .event-message {
+        color: #666;
+    }
+</style>
