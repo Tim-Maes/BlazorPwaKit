@@ -72,7 +72,13 @@ self.addEventListener('fetch', event => {
     }
 });
 
-// Receive cache policies from Blazor via postMessage
+// Notify clients when a new service worker is waiting (update available)
+self.addEventListener('statechange', event => {
+    if (event.target.state === 'installed' && self.registration.waiting) {
+        notifyClientsAboutUpdate();
+    }
+});
+
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SET_CACHE_POLICIES') {
         cachePolicies = event.data.policies || {};
@@ -92,3 +98,22 @@ function getPolicyForUrl(url) {
     }
     return null;
 }
+
+function notifyClientsAboutUpdate() {
+    self.clients.matchAll({ type: 'window' }).then(clients => {
+        for (const client of clients) {
+            client.postMessage({ type: 'UPDATE_AVAILABLE' });
+        }
+    });
+}
+
+// Listen for updatefound and setup statechange
+self.addEventListener('updatefound', () => {
+    if (self.registration.installing) {
+        self.registration.installing.addEventListener('statechange', event => {
+            if (event.target.state === 'installed' && self.registration.waiting) {
+                notifyClientsAboutUpdate();
+            }
+        });
+    }
+});

@@ -1,0 +1,61 @@
+@using BlazorPwaKit
+@inject ServiceWorkerManager ServiceWorkerManager
+
+@if (updateAvailable)
+{
+    <div class="@($"update-prompt {PromptClass}")">
+        <span>@PromptMessage</span>
+        <button class="btn btn-primary" @onclick="Reload">@ButtonText</button>
+    </div>
+}
+
+@code {
+    [Parameter] public string PromptMessage { get; set; } = "A new version is available.";
+    [Parameter] public string ButtonText { get; set; } = "Reload";
+    [Parameter] public string PromptClass { get; set; } = string.Empty;
+
+    private bool updateAvailable = false;
+
+    protected override void OnInitialized()
+    {
+        ServiceWorkerManager.ServiceWorkerUpdateAvailable += OnUpdateAvailable;
+    }
+
+    private void OnUpdateAvailable(object? sender, ServiceWorkerEvent e)
+    {
+        updateAvailable = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Reload()
+    {
+        JS.InvokeVoidAsync("navigator.serviceWorker.controller.postMessage", new { type = "SKIP_WAITING" });
+        JS.InvokeVoidAsync("location.reload");
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    public void Dispose()
+    {
+        ServiceWorkerManager.ServiceWorkerUpdateAvailable -= OnUpdateAvailable;
+    }
+}
+
+<style>
+.update-prompt {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 6px;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+</style>

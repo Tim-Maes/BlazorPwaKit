@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlazorPwaKit.Extensions;
+namespace BlazorPwaKit;
 
 /// <summary>
 /// Extension methods for registering BlazorPwaKit services

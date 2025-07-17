@@ -1,5 +1,4 @@
 using BlazorPwaKit.Example;
-using BlazorPwaKit.Extensions;
 using BlazorPwaKit;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

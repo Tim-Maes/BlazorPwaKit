@@ -9,7 +9,11 @@ export function initialize(dotNetObjectReference) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
             if (dotNetReference) {
-                dotNetReference.invokeMethodAsync('OnServiceWorkerEvent', 'message', event.data);
+                if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                    dotNetReference.invokeMethodAsync('OnServiceWorkerEvent', 'updateavailable', null);
+                } else {
+                    dotNetReference.invokeMethodAsync('OnServiceWorkerEvent', 'message', event.data);
+                }
             }
         });
     }

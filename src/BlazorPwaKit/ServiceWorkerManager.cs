@@ -47,6 +47,7 @@ public class ServiceWorkerManager : IAsyncDisposable
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerMessage;
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerError;
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerUpdated;
+    public event EventHandler<ServiceWorkerEvent>? ServiceWorkerUpdateAvailable;
 
     public ServiceWorkerManager(IJSRuntime jsRuntime)
     {
@@ -261,6 +262,9 @@ public class ServiceWorkerManager : IAsyncDisposable
                 break;
             case "updated":
                 ServiceWorkerUpdated?.Invoke(this, serviceWorkerEvent);
+                break;
+            case "updateavailable":
+                ServiceWorkerUpdateAvailable?.Invoke(this, serviceWorkerEvent);
                 break;
         }
     }
