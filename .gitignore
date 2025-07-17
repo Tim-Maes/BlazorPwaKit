@@ -361,3 +361,64 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+.vscode/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+*.snupkg
+
+# Static web assets
+wwwroot/staticwebassets/
+wwwroot/staticwebassets.build.json
+wwwroot/staticwebassets.runtime.json
+
+# Blazor
+**/wwwroot/_framework/
+**/wwwroot/_content/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Rider
+.idea/
+*.sln.iml
+
+# Test results
+TestResults/
+
+# Others
+*.swp
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# Local secrets
+secrets.json
+.env
+.env.*
