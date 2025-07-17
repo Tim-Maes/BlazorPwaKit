@@ -9,8 +9,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-// Add BlazorPwaKit services
-builder.Services.AddBlazorPwaKit();
+// Add BlazorPwaKit services with custom offline fallback path (optional)
+builder.Services.AddBlazorPwaKit(options =>
+{
+    options.OfflineFallbackPath = "/offline";
+});
 
 var host = builder.Build();
 

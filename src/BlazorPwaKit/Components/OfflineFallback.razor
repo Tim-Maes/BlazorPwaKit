@@ -1,0 +1,30 @@
+@namespace BlazorPwaKit.Components
+
+@if (ChildContent is not null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="offline-fallback-default">
+        <h2>You are offline</h2>
+        <p>This page or resource is not available while offline.</p>
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}
+
+<style>
+.offline-fallback-default {
+    text-align: center;
+    margin: 60px auto;
+    max-width: 400px;
+    padding: 32px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    color: #888;
+}
+</style>

@@ -159,6 +159,24 @@ export async function setCachePolicies(policies) {
     }
 }
 
+export async function setOfflineFallbackPath(path) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SET_OFFLINE_FALLBACK_PATH',
+            path: path
+        });
+    } else {
+        navigator.serviceWorker.ready.then(reg => {
+            if (reg.active) {
+                reg.active.postMessage({
+                    type: 'SET_OFFLINE_FALLBACK_PATH',
+                    path: path
+                });
+            }
+        });
+    }
+}
+
 function setupRegistrationEventListeners(registration) {
     if (registration.installing) {
         setupServiceWorkerEventListeners(registration.installing);

@@ -8,9 +8,26 @@
     <PackageId>BlazorPwaKit</PackageId>
     <PackageVersion>0.0.1</PackageVersion>
     <Authors>BlazorPwaKit</Authors>
-    <Description>A comprehensive toolkit for building Progressive Web Apps with Blazor</Description>
+    <Description>A toolkit for building Progressive Web Apps with Blazor</Description>
     <PackageTags>blazor;pwa;service-worker;offline</PackageTags>
+    <Title>PWA kit for Blazor apps</Title>
+    <PackageProjectUrl>https://www.github.com/Tim-Maes/BlazorPwaKit</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://www.github.com/Tim-Maes/BlazorPwaKit</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

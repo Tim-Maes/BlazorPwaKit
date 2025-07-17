@@ -39,6 +39,7 @@ public class ServiceWorkerManager : IAsyncDisposable
     private readonly IJSRuntime _jsRuntime;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
     private readonly Dictionary<string, ServiceWorkerRegistration> _registrations = new();
+    private readonly BlazorPwaKitOptions _options;
     private ICachePolicyProvider? _cachePolicyProvider;
 
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerInstalled;
@@ -49,13 +50,16 @@ public class ServiceWorkerManager : IAsyncDisposable
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerUpdated;
     public event EventHandler<ServiceWorkerEvent>? ServiceWorkerUpdateAvailable;
 
-    public ServiceWorkerManager(IJSRuntime jsRuntime)
+    public ServiceWorkerManager(IJSRuntime jsRuntime, BlazorPwaKitOptions options)
     {
         _jsRuntime = jsRuntime;
+        _options = options;
         _moduleTask = new Lazy<Task<IJSObjectReference>>(async () =>
         {
             var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorPwaKit/serviceWorkerManager.js");
             await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this));
+            // Send offline fallback path to service worker
+            await module.InvokeVoidAsync("setOfflineFallbackPath", _options.OfflineFallbackPath);
             return module;
         });
     }

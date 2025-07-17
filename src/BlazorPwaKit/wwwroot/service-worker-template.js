@@ -3,8 +3,22 @@
 
 const CACHE_NAME = 'blazorpwakit-cache-v1';
 let cachePolicies = {};
+let offlineFallbackPath = '/offline';
 
-// Strategies
+// Listen for offline fallback path from Blazor
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SET_OFFLINE_FALLBACK_PATH') {
+        offlineFallbackPath = event.data.path || '/offline';
+    }
+    if (event.data && event.data.type === 'SET_CACHE_POLICIES') {
+        cachePolicies = event.data.policies || {};
+        console.log('BlazorPwaKit SW: Received cache policies', cachePolicies);
+    }
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
 const strategies = {
     CacheFirst: async (event) => {
         const cache = await caches.open(CACHE_NAME);
@@ -64,6 +78,17 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = event.request.url;
     const policy = getPolicyForUrl(url);
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .catch(async () => {
+                    const cache = await caches.open(CACHE_NAME);
+                    const fallback = await cache.match(offlineFallbackPath);
+                    return fallback || Response.error();
+                })
+        );
+        return;
+    }
     if (policy && strategies[policy]) {
         event.respondWith(strategies[policy](event));
     } else {
@@ -72,25 +97,7 @@ self.addEventListener('fetch', event => {
     }
 });
 
-// Notify clients when a new service worker is waiting (update available)
-self.addEventListener('statechange', event => {
-    if (event.target.state === 'installed' && self.registration.waiting) {
-        notifyClientsAboutUpdate();
-    }
-});
-
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SET_CACHE_POLICIES') {
-        cachePolicies = event.data.policies || {};
-        console.log('BlazorPwaKit SW: Received cache policies', cachePolicies);
-    }
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});
-
 function getPolicyForUrl(url) {
-    // Exact match or pattern match
     for (const pattern in cachePolicies) {
         if (url.includes(pattern)) {
             return cachePolicies[pattern];
@@ -99,6 +106,7 @@ function getPolicyForUrl(url) {
     return null;
 }
 
+// Notify clients when a new service worker is waiting (update available)
 function notifyClientsAboutUpdate() {
     self.clients.matchAll({ type: 'window' }).then(clients => {
         for (const client of clients) {
@@ -106,8 +114,6 @@ function notifyClientsAboutUpdate() {
         }
     });
 }
-
-// Listen for updatefound and setup statechange
 self.addEventListener('updatefound', () => {
     if (self.registration.installing) {
         self.registration.installing.addEventListener('statechange', event => {

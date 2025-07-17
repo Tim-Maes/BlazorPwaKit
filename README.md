@@ -8,6 +8,7 @@ Still in early development.
 
 - **ServiceWorkerManager**: Register, update, and unregister service workers with full lifecycle event support.
 - **CachePolicyProvider**: Attribute/service for per-resource caching strategies (CacheFirst, NetworkFirst, StaleWhileRevalidate, etc.).
+- **OfflineFallback**: Configurable component to render a “you’re offline” page or placeholder when a requested route or asset isn’t cached.
 - **UpdatePrompt**: UI component that detects a new service worker version and prompts the user to refresh/reload.
 - **ConnectivityStatus**: UI component and service for real-time online/offline state and change events.
 - **Easy DI integration**: One-liner setup for all services and components.
@@ -27,6 +28,12 @@ dotnet add package BlazorPwaKit
 using BlazorPwaKit;
 
 builder.Services.AddBlazorPwaKit();
+
+// Optional: customize fallback route
+builder.Services.AddBlazorPwaKit(options =>
+{
+    options.OfflineFallbackPath = "/offline"; 
+});
 ```
 
 ### 3. Add Usings
@@ -60,6 +67,18 @@ Add to your `_Imports.razor` (or at the top of your components):
 <ConnectivityStatus />
 <!-- Or customize: -->
 <ConnectivityStatus OnlineText="Connected" OfflineText="Disconnected" Class="my-conn-status" />
+```
+
+- **Offline Fallback:**
+
+```razor
+@* Default fallback *@
+<OfflineFallback />
+
+@* Or custom content *@
+<OfflineFallback>
+    <div>Your custom offline message</div>
+</OfflineFallback>
 ```
 
 ### 5. Advanced: Cache Policies
