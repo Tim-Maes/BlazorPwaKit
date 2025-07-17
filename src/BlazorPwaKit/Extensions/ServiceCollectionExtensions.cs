@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ServiceWorkerManager>();
         services.AddSingleton<ICachePolicyProvider, CachePolicyProvider>();
+        services.AddScoped<ConnectivityService>();
         return services;
     }
     

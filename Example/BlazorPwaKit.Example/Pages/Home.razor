@@ -6,6 +6,8 @@
 
 <p>Welcome to the BlazorPwaKit example application! This demonstrates the Progressive Web App toolkit for Blazor.</p>
 
+<ConnectivityStatus />
+
 <ServiceWorkerStatus />
 
 <div class="mt-4">
@@ -34,7 +36,7 @@
     <ul>
         <li><strong>ServiceWorkerManager</strong> - Registers, updates and unregisters your app's service worker; surfaces lifecycle events</li>
         <li><strong>CachePolicyProvider</strong> - Attribute or service to declare per-resource caching strategies</li>
-        <li><strong>UpdatePrompt</strong> - Coming soon: UI component that detects a new service worker version and prompts the user to refresh</li>
+        <li><strong>UpdatePrompt</strong> - UI component that detects a new service worker version and prompts the user to refresh</li>
         <li><strong>OfflineFallback</strong> - Coming soon: Configurable component to render offline pages</li>
         <li><strong>PushNotificationManager</strong> - Coming soon: Blazor service + UI helpers for push notifications</li>
         <li><strong>BackgroundSyncService</strong> - Coming soon: Queues failed API calls and retries them when connectivity is restored</li>
