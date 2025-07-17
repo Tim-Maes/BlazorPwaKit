@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: CD
+on:
+  release:
+    types:
+      - published
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  NuGetDirectory: ${{ github.workspace }}/nuget
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  publish-nuget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build Solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Pack NuGet Package
+        run: dotnet pack src/BlazorPwaKit/BlazorPwaKit.csproj --configuration Release --output ${{ env.NuGetDirectory }} --no-build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          if-no-files-found: error
+          retention-days: 30
+          path: ${{ env.NuGetDirectory }}/*.nupkg
+
+      - name: Publish to NuGet
+        run: |
+          foreach ($file in Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg) {
+            if ($file.Name -like "BlazorPwaKit.*.nupkg") {
+              Write-Host "Publishing $($file.Name)"
+              dotnet nuget push $file `
+                --api-key "${{ secrets.NUGET_API_KEY }}" `
+                --source https://api.nuget.org/v3/index.json `
+                --skip-duplicate
+            }
+          }
