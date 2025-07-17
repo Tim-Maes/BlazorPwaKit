@@ -9,7 +9,13 @@ A toolkit for building Progressive Web Apps (PWAs) with Blazor WebAssembly.
 
 ## Usage
 1. Add the library to your Blazor WebAssembly project.
-2. Register services in `Program.cs`:builder.Services.AddBlazorPwaKit();3. Use the `ServiceWorkerManager` in your components or use the `<ServiceWorkerStatus />` demo component.
+2. Register services in `Program.cs`:
+
+```
+builder.Services.AddBlazorPwaKit();
+```
+
+3. Use the `ServiceWorkerManager` in your components or use the `<ServiceWorkerStatus />` demo component.
 
 ## Example
 See the `Example/BlazorPwaKit.Example` project for a working demo.
