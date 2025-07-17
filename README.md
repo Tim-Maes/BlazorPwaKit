@@ -50,7 +50,7 @@ Add to your `_Imports.razor` (or at the top of your components):
 - **Service Worker Status:**
 
 ```razor
-- <ServiceWorkerStatus />
+<ServiceWorkerStatus />
 ```
 
 - **Update Prompt:**
